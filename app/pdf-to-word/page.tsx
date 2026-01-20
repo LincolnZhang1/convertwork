@@ -1,24 +1,12 @@
-import { Metadata } from 'next'
+'use client'
+
+import { useState } from 'react'
 import Navigation from '@/components/Navigation'
 import FileUploader from '@/components/FileUploader'
 import FormatSelector from '@/components/FormatSelector'
 import ConversionProgress from '@/components/ConversionProgress'
 import ConversionResult from '@/components/ConversionResult'
 import Link from 'next/link'
-
-export const metadata: Metadata = {
-  title: 'PDF to Word Converter | Free Online PDF to DOCX Conversion',
-  description: 'Convert PDF files to Word documents (DOCX) instantly. Free online PDF to Word converter with high quality output. No registration required.',
-  keywords: 'PDF to Word, PDF converter, free PDF converter, PDF to DOCX, online converter, document conversion',
-  openGraph: {
-    title: 'PDF to Word Converter - Free Online Tool',
-    description: 'Convert PDF files to Word documents instantly. High quality, free, no registration required.',
-    type: 'website',
-  },
-  alternates: {
-    canonical: 'https://anyconvert.com/pdf-to-word',
-  },
-}
 
 export default function PdfToWordPage() {
   return (
@@ -54,7 +42,7 @@ export default function PdfToWordPage() {
           borderRadius: '12px', 
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
-          <FileUploader onFileSelect={() => {}} />
+          <FileUploader onFileSelect={() => {}} selectedFile={null} />
           
           <div style={{ marginTop: '20px' }}>
             <h3 style={{ marginBottom: '15px', color: '#333' }}>
@@ -94,9 +82,9 @@ export default function PdfToWordPage() {
           />
           
           <ConversionResult 
-            resultUrl={null}
+            downloadUrl=""
             fileName=""
-            fileSize={0}
+            targetFormat="docx"
           />
         </div>
 

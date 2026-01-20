@@ -1,11 +1,18 @@
 [build]
-  command = "npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = ".next"
   functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  NPM_FLAGS = "--legacy-peer-deps"
+  PYTHON_VERSION = "3.9"
+  SHARP_IGNORE_GLOBAL_LIBVIPS = "true"
+
+# Install native dependencies properly
+[build.ignore]
+  command = "ls -la"
 
 [[redirects]]
   from = "/api/*"
@@ -19,6 +26,7 @@
 
 [functions]
   node_bundler = "esbuild"
+  included_files = ["node_modules/**"]
 
 [[headers]]
   for = "/*"
@@ -35,7 +43,7 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 [context.production]
-  command = "npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
