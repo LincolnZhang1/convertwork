@@ -1,0 +1,20 @@
+# Favicon Setup Instructions
+# Place your img_8818.png file in this directory, then run:
+# ./setup_favicon.sh
+#
+# This will create all necessary favicon files from img_8818.png
+#
+# For best results, ensure img_8818.png is at least 512x512 pixels
+# The script will create:
+# - favicon.ico (copy of img_8818.png - consider converting to .ico format)
+# - apple-touch-icon.png (for iOS devices)
+# - icon-192.png (PWA icon)
+# - icon-512.png (PWA icon)
+# - mstile-150x150.png (Microsoft tiles)
+#
+# Optional: Resize images to exact dimensions for better quality:
+# - favicon.ico: 16x16, 32x32
+# - apple-touch-icon.png: 180x180
+# - icon-192.png: 192x192
+# - icon-512.png: 512x512
+# - mstile-150x150.png: 150x150
