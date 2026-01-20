@@ -7,26 +7,12 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
   NPM_FLAGS = "--legacy-peer-deps"
-  PYTHON_VERSION = "3.9"
   SHARP_IGNORE_GLOBAL_LIBVIPS = "true"
-
-# Install native dependencies properly
-[build.ignore]
-  command = "ls -la"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 404
-
-[functions]
-  node_bundler = "esbuild"
-  included_files = ["node_modules/**"]
 
 [[headers]]
   for = "/*"
@@ -41,9 +27,6 @@
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
-
-[context.production]
-  command = "npm install --legacy-peer-deps && npm run build"
 
 [context.deploy-preview]
   command = "npm install --legacy-peer-deps && npm run build"
