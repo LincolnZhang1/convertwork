@@ -7,27 +7,34 @@ export async function POST(request: NextRequest) {
     const targetFormat = formData.get('targetFormat') as string
     
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      return NextResponse.json({ 
+        success: false,
+        error: 'No file provided' 
+      }, { status: 400 })
     }
 
-    // For now, return a simple conversion response
-    // In production, you would implement actual conversion logic
-    const buffer = await file.arrayBuffer()
+    // Simulate conversion for demo purposes
+    // In production, implement actual conversion logic
+    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate processing time
     
-    // Simulate conversion by returning the original file
-    const response = new NextResponse(buffer, {
+    // For demo, just return the original file with new extension
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    
+    // Return the file directly
+    return new NextResponse(buffer, {
+      status: 200,
       headers: {
         'Content-Type': 'application/octet-stream',
         'Content-Disposition': `attachment; filename="converted.${targetFormat}"`,
+        'Cache-Control': 'no-cache',
       },
     })
-    
-    return response
   } catch (error) {
     console.error('Conversion error:', error)
-    return NextResponse.json(
-      { error: 'Conversion failed' }, 
-      { status: 500 }
-    )
+    return NextResponse.json({ 
+      success: false,
+      error: 'Conversion failed. Please try again.' 
+    }, { status: 500 })
   }
 }

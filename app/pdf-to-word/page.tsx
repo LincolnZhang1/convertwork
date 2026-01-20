@@ -9,6 +9,62 @@ import ConversionResult from '@/components/ConversionResult'
 import Link from 'next/link'
 
 export default function PdfToWordPage() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFormat, setSelectedFormat] = useState('docx')
+  const [conversionStatus, setConversionStatus] = useState<'idle' | 'converting' | 'completed' | 'error'>('idle')
+  const [conversionProgress, setConversionProgress] = useState(0)
+  const [conversionError, setConversionError] = useState<string | null>(null)
+  const [downloadUrl, setDownloadUrl] = useState<string>('')
+
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file)
+    setConversionStatus('idle')
+    setConversionError(null)
+    setDownloadUrl('')
+  }
+
+  const handleFormatSelect = (format: string) => {
+    setSelectedFormat(format)
+  }
+
+  const handleConvert = async () => {
+    if (!selectedFile) {
+      alert('Please select a file first')
+      return
+    }
+
+    setConversionStatus('converting')
+    setConversionProgress(0)
+    setConversionError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+      formData.append('targetFormat', selectedFormat)
+
+      const response = await fetch('/api/convert', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(errorText)
+      }
+
+      // Create download URL from the response
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      setDownloadUrl(url)
+      setConversionStatus('completed')
+      setConversionProgress(100)
+
+    } catch (error) {
+      console.error('Conversion error:', error)
+      setConversionStatus('error')
+      setConversionError(error instanceof Error ? error.message : 'Conversion failed')
+    }
+  }
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa', color: '#1a202c' }}>
       <Navigation />
@@ -42,7 +98,10 @@ export default function PdfToWordPage() {
           borderRadius: '12px', 
           boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
         }}>
-          <FileUploader onFileSelect={() => {}} selectedFile={null} />
+          <FileUploader 
+            onFileSelect={handleFileSelect} 
+            selectedFile={selectedFile} 
+          />
           
           <div style={{ marginTop: '20px' }}>
             <h3 style={{ marginBottom: '15px', color: '#333' }}>
@@ -50,8 +109,8 @@ export default function PdfToWordPage() {
             </h3>
             <FormatSelector 
               formats={['docx', 'doc']}
-              selectedFormat="docx"
-              onFormatSelect={() => {}}
+              selectedFormat={selectedFormat}
+              onFormatSelect={handleFormatSelect}
             />
           </div>
 
@@ -59,33 +118,38 @@ export default function PdfToWordPage() {
             marginTop: '30px', 
             textAlign: 'center' 
           }}>
-            <button style={{
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              padding: '15px 40px',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}>
-              <i className="fas fa-file-pdf" style={{ marginRight: '8px' }}></i>
-              Convert to Word
+            <button 
+              onClick={handleConvert}
+              disabled={!selectedFile || conversionStatus === 'converting'}
+              style={{
+                backgroundColor: selectedFile && conversionStatus !== 'converting' ? '#007bff' : '#6c757d',
+                color: 'white',
+                border: 'none',
+                padding: '15px 40px',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: selectedFile && conversionStatus !== 'converting' ? 'pointer' : 'not-allowed',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              {conversionStatus === 'converting' ? 'Converting...' : 'Convert to Word'}
             </button>
           </div>
 
           <ConversionProgress 
-            status="idle"
-            progress={0}
-            error={null}
+            status={conversionStatus}
+            progress={conversionProgress}
+            error={conversionError}
           />
           
-          <ConversionResult 
-            downloadUrl=""
-            fileName=""
-            targetFormat="docx"
-          />
+          {downloadUrl && (
+            <ConversionResult 
+              downloadUrl={downloadUrl}
+              fileName={`converted.${selectedFormat}`}
+              targetFormat={selectedFormat}
+            />
+          )}
         </div>
 
         {/* How to Use Section */}
