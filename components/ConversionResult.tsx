@@ -30,7 +30,7 @@ export default function ConversionResult({ downloadUrl, fileName, targetFormat }
       // 清理URL对象
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      alert('Download failed: ' + error.message)
+      alert('Download failed: ' + (error instanceof Error ? error.message : String(error)))
     }
   }
 
