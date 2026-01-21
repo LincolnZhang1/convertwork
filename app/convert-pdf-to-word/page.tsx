@@ -69,10 +69,7 @@ export default function ConvertPdfToWordPage() {
           try {
             const data = JSON.parse(xhr.responseText)
             if (data.success) {
-              const downloadUrl = data.downloadUrl.startsWith('/temp/')
-                ? `${window.location.origin}/api/temp/${data.downloadUrl.replace('/temp/', '')}`
-                : data.downloadUrl
-              setResultUrl(downloadUrl)
+              setResultUrl(data.downloadUrl) // 存储下载路径
               setResultFileName(data.fileName || `converted.${targetFormat}`)
               setConversionStatus('completed')
               setProgress(100)

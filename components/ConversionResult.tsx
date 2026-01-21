@@ -10,13 +10,28 @@ export default function ConversionResult({ downloadUrl, fileName, targetFormat }
   // 从文件名中提取实际的输出格式
   const actualFormat = fileName.split('.').pop()?.toUpperCase() || targetFormat.toUpperCase()
   
-  const handleDownload = () => {
-    const link = document.createElement('a')
-    link.href = downloadUrl
-    link.download = fileName // 直接使用后端返回的实际文件名
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(downloadUrl)
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // 清理URL对象
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      alert('Download failed: ' + error.message)
+    }
   }
 
   return (
@@ -30,21 +45,10 @@ export default function ConversionResult({ downloadUrl, fileName, targetFormat }
         <button
           className="button primary large"
           onClick={handleDownload}
-          style={{ marginRight: '10px' }}
         >
           <i className="fas fa-download" style={{ marginRight: '8px' }}></i>
           Download File
         </button>
-        <a
-          href={downloadUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="button"
-          style={{ marginLeft: '10px' }}
-        >
-          <i className="fas fa-external-link-alt" style={{ marginRight: '8px' }}></i>
-          Open in New Window
-        </a>
       </div>
       <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#fff', borderRadius: '4px' }}>
         <p style={{ margin: 0, fontSize: '14px', color: '#666' }}>
